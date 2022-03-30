@@ -1,16 +1,18 @@
-#study start date.  should match date in project.yaml
-start_date = "2021-06-01"
 
-#study end date.  should match date in project.yaml
-end_date = "2021-12-01"
+# enter table name
+table = "therapeutics"
 
-#demographic variables by which code use is broken down
-#select from ["sex", "age_band", "region", "imd", "ethnicity", "learning_disability"]
-demographics = ["sex", "age_band", "region", "imd", "ethnicity", "learning_disability", "care_home_status"]
+# enter filters for schema
+# these are useful to (a) make the data size manageable (e.g. one month or year of data)
+# and (b) look at a subset of interest e.g. patients with COVID
+schema_filter = {"": "where CAST(Received AS DATE) <= '2022-01-24'",
+         "_non_hospitalised": "where CAST(Received AS DATE) <= '2022-01-24' AND COVID_indication='non_hospitalised'"}
 
-#name of measure
-marker="Systolic blood pressure"
-
-#codelist path
-codelist_path = "codelists/opensafely-systolic-blood-pressure-qof.csv"
-
+# columns to describe
+columns_to_describe = {
+    "columns": ["Diagnosis", "FormName", "Region", "Der_LoadDate", "AgeAtReceivedDate", "Count"],
+    "threshold": 50,
+    "where":"CAST(Received AS DATE) <= '2022-01-24'", 
+    "include_counts":False,
+    }
+    

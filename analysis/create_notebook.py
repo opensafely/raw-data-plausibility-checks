@@ -1,11 +1,11 @@
 import nbformat as nbf
-from config import demographics
+#from config import demographics
 
 
 nb = nbf.v4.new_notebook()
 
 
-imports = """\
+imports = """
 import sys
 import pandas as pd
 import numpy as np
@@ -15,67 +15,67 @@ register_matplotlib_converters()
 from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
-from config import marker, start_date, end_date, demographics, codelist_path
+from config import dbconn, dataset, columns_to_describe
 from IPython.display import Image, display
 from utilities import *
 %matplotlib inline
 
+import pyodbc
+import os
+from datetime import date, datetime
+
+#from utilities import *
+from sense_checking import *
+
+pd.set_option('display.max_colwidth', 250)
+
+# get the server credentials
+dbconn = os.environ.get('FULL_DATABASE_URL', None).strip('"')
+
 """
 
-header = """\
+header = """
 display(
-md("# Service Restoration Observatory"),
-md(f"## Changes in {marker} between {start_date} and {end_date}"),
-md(f"Below are various time-series graphs showing changes in {marker} code use."),
+md("# Data Plausibility Check for {dataset}"),
+md(f"Note: all row/patient counts are rounded to the nearest 10 and counts <=5 removed"),
 )
 """
 
-methods = """\
+methods = """
 display(
 md("### Methods"),
-md(f"Using OpenSAFELY-TPP, covering 40% of England's population, we have assessed coding activity related to {marker} between {start_date} and {end_date}. The codelist used can be found here at [OpenSAFELY Codelists](https://codelists.opensafely.org/).  For each month within the study period, we have calculated the rate at which the code was recorded per 1000 registered patients."),
+md(f"The {dataset} dataset has been linked to patients in OpenSAFELY-TPP, covering 40% of England's population."),
 md(f"All analytical code and output is available for inspection at the [OpenSAFELY GitHub repository](https://github.com/opensafely)")
 )
 """
 
-get_data = """\
-codelist = pd.read_csv(f'../{codelist_path}')
+notebook_run_date = """\
+display(
+md(f"This notebook was run on {date.today().strftime('%Y-%m-%d')}"\
+    "and reflects the dataset at this date, "\
+    "but has been filtered to reflect the original data submission (`'Received' <= 2022-01-24`)."
+    )
+)"""
 
-image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
+get_data = """
 image_paths['total'] = '../output/joined/plot_total.png'
 """
+#image_paths = {d: f'../output/joined/plot_{d}.png' for d in demographics}
 
-output_total_title = """\
-display(
-md(f"## Total {marker} Number")
-)
+schema = """
+display(md("### Schema"))
+get_schema(dbconn, table=dataset, where=schema_filter)
 """
 
-output_total_plot = """\
-display(Image(filename=image_paths['total']))
-"""
+column_descriptions = """
+display(md("### Column Summaries"))
 
-output_event_codes = """\
-display(
-md("### Sub totals by sub codes"),
-md("Events for the top 5 subcodes across the study period"))
-
-child_table = pd.read_csv('../output/joined/child_code_table.csv')
-child_table
-    """
-
-output_practice_title = """\
-display(
-md("## Total Number by GP Practice")
-)
-"""
-
-output_practice_plot = """\
-
-practice_table = pd.read_csv('../output/joined/rate_table_practice.csv', parse_dates=['date']).sort_values(by='date')
-percentage_practices = get_percentage_practices(practice_table)
-md(f"Percentage of practices with a recording of a code within the codelist during the study period: {percentage_practices}%")
-display(Image(filename='../output/joined/decile_chart.png'))
+counts_of_distinct_values(dbconn, table=dataset, 
+    columns=columns_to_describe["columns"], 
+    threshold=columns_to_describe["threshold"], 
+    where=columns_to_describe["where"],
+    include_counts=columns_to_describe["include_counts"]
+    )
 """
 
 nb['cells'] = [
@@ -83,33 +83,31 @@ nb['cells'] = [
     nbf.v4.new_code_cell(header),
     nbf.v4.new_code_cell(methods),
     nbf.v4.new_code_cell(get_data),
-    nbf.v4.new_code_cell(output_total_title),
-    nbf.v4.new_code_cell(output_total_plot),
-    nbf.v4.new_code_cell(output_event_codes),
-    nbf.v4.new_code_cell(output_practice_title),
-    nbf.v4.new_code_cell(output_practice_plot),
+    nbf.v4.new_code_cell(notebook_run_date),
+    nbf.v4.new_code_cell(schema),
+    nbf.v4.new_code_cell(column_descriptions),
     ]
 
 counter = """\
 i=0
 """
 
-nb['cells'].append(nbf.v4.new_code_cell(counter))
+# nb['cells'].append(nbf.v4.new_code_cell(counter))
 
-for d in range(len(demographics)):
-    cell_counts = """\
-    display(
-    md(f"## Breakdown by {demographics[i]}")
-    )
+# for d in range(len(demographics)):
+#     cell_counts = """\
+#     display(
+#     md(f"## Breakdown by {demographics[i]}")
+#     )
    
-    """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
+#     """
+#     nb['cells'].append(nbf.v4.new_code_cell(cell_counts))
     
-    cell_plot = """\
-    display(Image(filename=image_paths[demographics[i]]))
-    i+=1
-    """
-    nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
+#     cell_plot = """\
+#     display(Image(filename=image_paths[demographics[i]]))
+#     i+=1
+#     """
+#     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
 
 
-nbf.write(nb, 'analysis/SRO_Notebook.ipynb')
+nbf.write(nb, 'analysis/Test_Notebook.ipynb')
