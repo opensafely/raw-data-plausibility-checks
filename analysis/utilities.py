@@ -38,3 +38,12 @@ def simple_sql(dbconn, table, col, where):
     with closing_connection(dbconn) as cnxn:
         out = pd.read_sql(f"select {col}, count(*) as row_count from {table} {where_clause} group by {col}", cnxn)
     return out
+
+
+def import_codelist(codelist_name, code_column='code', term_column='term'):
+    ''' Import codelist_name.csv from the codelists folder. 
+        code_column / term_column specify the names of the columns which are imported
+    '''
+    codelist = pd.read_csv(os.path.join('..','codelists', f'{codelist_name}.csv'), usecols=[code_column, term_column])
+    codelist[code_column] = codelist[code_column].astype(str)
+    return codelist
