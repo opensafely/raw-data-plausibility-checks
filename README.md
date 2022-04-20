@@ -29,3 +29,13 @@ checking of datasets.
 6.  Someone with L2/3 access can then clone the repository and run the notebook as per [these instructions](https://bennettinstitute-team-manual.pages.dev/tech-team/playbooks/opensafely-tpp-notebooks/).
 
 
+## How to use the numeric values template
+
+1.  Add desired codelist(s) to `codelists/codelists.txt`
+2.  Download codelist(s) using `opensafely codelists update`
+3.  Specify one codelist and other required information in `analysis/config_numeric_value_checks.py`.
+4.  Generate the notebook (ipynb) file [locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run create_notebook_numeric`. Alternatively, run the `analysis/create_notebook_numeric_value_checks.py` file itself directly.
+5.  Repeat steps 3-4 for each codelist.
+5.  Commit the new & modified files to the repo.
+6.  Someone with L2/3 access can then clone the repository and run the notebook as per [these instructions](https://bennettinstitute-team-manual.pages.dev/tech-team/playbooks/opensafely-tpp-notebooks/).
+7.  Notebooks can be saved to html and made available for release.
