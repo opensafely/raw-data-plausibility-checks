@@ -24,7 +24,6 @@ import pyodbc
 import os
 from datetime import date, datetime
 
-#from utilities import *
 from sense_checking import *
 
 pd.set_option('display.max_colwidth', 250)
@@ -36,7 +35,7 @@ dbconn = os.environ.get('FULL_DATABASE_URL', None).strip('"')
 
 header = """
 display(
-md("# Data Plausibility Check for {dataset}"),
+md(f"# Data Plausibility Check for {dataset}"),
 md(f"Note: all row/patient counts are rounded to the nearest 10 and counts <=5 removed"),
 )
 """
