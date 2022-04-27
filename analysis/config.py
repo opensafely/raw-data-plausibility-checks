@@ -1,6 +1,6 @@
 
 # enter table name
-table = "therapeutics"
+table = "CodedEvent"
 
 # enter filters for schema
 # these are useful to (a) make the data size manageable (e.g. one month or year of data)
