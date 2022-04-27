@@ -2,6 +2,9 @@
 # enter table name
 table = "CodedEvent"
 
+start_date = "2019-01-01"
+end_date = "2022-03-01"
+
 codelist_path = "codelists/user-bangzheng-creatinine.csv"
 
 # enter filters for schema
