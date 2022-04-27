@@ -2,6 +2,8 @@
 # enter table name
 table = "CodedEvent"
 
+codelist_path = "codelists/user-bangzheng-creatinine.csv"
+
 # enter filters for schema
 # these are useful to (a) make the data size manageable (e.g. one month or year of data)
 # and (b) look at a subset of interest e.g. patients with COVID
