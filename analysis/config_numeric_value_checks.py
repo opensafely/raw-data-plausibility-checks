@@ -1,5 +1,5 @@
 
-# enter codelist name as a string
+# enter codelist name as a string (include the full name of the csv, excluding the file extension)
 codelist_name = 'opensafely-ast'
 
 # specify headers for code column and term (description) column in dataset
