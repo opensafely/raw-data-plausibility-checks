@@ -15,7 +15,7 @@ register_matplotlib_converters()
 from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
-from config_numeric_value_checks import *
+
 from IPython.display import Image, display
 %matplotlib inline
 
@@ -23,10 +23,13 @@ import pyodbc
 import os
 from datetime import date, datetime
 
+sys.path.append('../analysis/')
 from utilities import import_codelist
 from numeric_value_functions import *
+from config_numeric_value_checks import *
 
 pd.set_option('display.max_colwidth', 250)
+pd.set_option('display.max_rows', 100)
 
 # get the server credentials
 dbconn = os.environ.get('FULL_DATABASE_URL', None).strip('"')
@@ -35,7 +38,7 @@ dbconn = os.environ.get('FULL_DATABASE_URL', None).strip('"')
 
 header = """
 display(
-md(f"# Data Plausibility Check (numeric values) for {codelist} codelist"),
+md(f"# Data Plausibility Check (numeric values) for *{codelist_name}* codelist"),
 md(f"Note: all row/patient counts are shown in thousands."),
 )
 """
@@ -51,7 +54,7 @@ md(f"All analytical code and output is available for inspection at the [OpenSAFE
 notebook_run_date = """\
 display(
 md(f'''This notebook was run on {date.today().strftime('%Y-%m-%d')}
-    and includes all activity within the {codelist} codelist recorded in {year}.'''
+    and includes all activity within the *{codelist_name}* codelist recorded in {year}.'''
     )
 )"""
 
@@ -108,4 +111,4 @@ i=0
 #     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
 
 
-nbf.write(nb, f'analysis/Notebook_numeric_values_{codelist_name}.ipynb')
+nbf.write(nb, f'notebooks/Notebook_numeric_values_{codelist_name}.ipynb')
