@@ -6,7 +6,6 @@ codelist_name = "bp_cod"
 code_column = "code"
 term_column = "term"
 
-
 # enter year
 # (must be a four-digit numeric value e.g. 2020)
 year = 2021
@@ -15,4 +14,4 @@ year = 2021
 # Use positive integers
 # Note zeros will be treated as missing.
 lower = 1
-upper = 100
+upper = 200
