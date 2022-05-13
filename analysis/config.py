@@ -9,6 +9,7 @@ schema_filter = {"": "where CAST(Received AS DATE) <= '2022-01-24'",
          "_non_hospitalised": "where CAST(Received AS DATE) <= '2022-01-24' AND COVID_indication='non_hospitalised'"}
 
 # columns to describe
+# this produces a simple summary of the columns supplied
 columns_to_describe = {
     "columns": ["Diagnosis", "FormName", "Region", "Der_LoadDate", "AgeAtReceivedDate", "Count"],
     "threshold": 50,
@@ -16,3 +17,11 @@ columns_to_describe = {
     "include_counts":False,
     }
     
+# check for duplicates -  IF NOT REQUIRED use empty dict
+# columns here normally patient_id only;
+# each column supplied will be checked for duplicates in isolation, not in combination
+duplicates = {
+#     "columns": ["patient_id"], 
+#     "threshold": 50, 
+#     "where": "CAST(Received AS DATE) <= '2022-01-24'"
+     }
