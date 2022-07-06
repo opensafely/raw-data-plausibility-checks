@@ -21,11 +21,11 @@ checking of datasets.
 
 ## How to use the template
 
-1. 
-2.  Make changes to the `config.py` in the analysis folder.
-3.  
+1.  Add codelist to the [codelists/codelists.txt](codelists/codelists.txt) file
+2.  Make changes to the [analysis/config.py](analysis/config.py) file
+3.  Make changes to the [analysis/config_numeric_value_checks.py](analysis/config_numeric_value_checks.py) file
 4.  This code can then be [run locally](https://docs.opensafely.org/en/latest/actions-pipelines/#running-your-code-locally) using the command `opensafely run run_all`
-5.  This generates a notebook (ipynb) file
+5.  This generates a Jupyter notebook (.ipynb) file in the analysis subfolder (e.g., `analysis/Notebook_numeric_values_<codelist_name>.ipynb`)
 6.  Someone with L2/3 access can then clone the repository and run the notebook as per [these instructions](https://bennettinstitute-team-manual.pages.dev/tech-team/playbooks/opensafely-tpp-notebooks/).
 
 

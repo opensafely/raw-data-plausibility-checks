@@ -5,7 +5,7 @@ import pandas as pd
 from cohortextractor import StudyDefinition, patients, codelist, Measure
 
 # Import codelists
-from codelists import codelist, ld_codes, nhse_care_homes_codes
+from codelists import codelist
 
 from config import start_date, end_date, codelist_path
 
@@ -13,8 +13,7 @@ codelist_df = pd.read_csv(codelist_path)
 codelist_expectation_codes = codelist_df["code"].unique()
 
 
-# Specifiy study defeinition
-
+# Specify study definition
 study = StudyDefinition(
     index_date=start_date,
     # Configure the expectations framework
@@ -118,6 +117,7 @@ study = StudyDefinition(
             },
         },
     ),
+    
     learning_disability=patients.with_these_clinical_events(
         ld_codes,
         on_or_before="index_date",
@@ -132,6 +132,7 @@ study = StudyDefinition(
         on_or_before="index_date",
         return_expectations={"incidence": 0.2},
     ),
+
     event=patients.with_these_clinical_events(
         codelist=codelist,
         between=["index_date", "last_day_of_month(index_date)"],

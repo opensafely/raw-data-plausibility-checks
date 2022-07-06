@@ -4,7 +4,8 @@ table = "CodedEvent"
 start_date = "2019-01-01"
 end_date = "2022-03-01"
 
-codelist_path = "codelists/user-bangzheng-creatinine.csv"
+codelist_path = "codelists/nhsd-primary-care-domain-refsets-bp_cod.csv"
+#codelist_path = "codelists/user-bangzheng-creatinine.csv"
 
 
 # enter filters for schema

@@ -1,5 +1,11 @@
 {
   "files": {
+    "nhsd-primary-care-domain-refsets-bp_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/bp_cod/20200812",
+      "url": "https://codelists.opensafely.org/codelist/nhsd-primary-care-domain-refsets/bp_cod/20200812/",
+      "downloaded_at": "2022-04-29 07:46:19.991904Z",
+      "sha": "6e49b65b40408d38b438cc2481fce122b710c49a"
+      }
     "opensafely-ethnicity.csv": {
       "id": "opensafely/ethnicity/2020-04-27",
       "url": "https://codelists.opensafely.org/codelist/opensafely/ethnicity/2020-04-27/",
@@ -36,5 +42,4 @@
       "downloaded_at": "2022-04-27 10:19:46.628236Z",
       "sha": "eb6442307e5f366e50b8b08bc9e6b4cf2339096a"
     }
-  }
 }
