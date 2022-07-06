@@ -1,12 +1,18 @@
 import nbformat as nbf
-#from config import demographics
-
+from config import *
 
 nb = nbf.v4.new_notebook()
 
+header = f"""# Raw data checks for table `{table}`
 
-imports = """
-import sys
+### Methods
+The {table} dataset has been linked to patients in OpenSAFELY-TPP, covering 40% of England's population.
+All row/patient counts are rounded to the nearest 10 and counts <=7 removed.
+All analytical code and output is available for inspection at the [OpenSAFELY GitHub repository](https://github.com/opensafely)
+"""
+
+imports = """import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,16 +21,15 @@ register_matplotlib_converters()
 from IPython.display import HTML
 from IPython.display import Markdown as md
 from IPython.core.display import HTML as Center
-from config import dbconn, dataset, columns_to_describe
 from IPython.display import Image, display
-from utilities import *
 %matplotlib inline
-
 import pyodbc
-import os
 from datetime import date, datetime
 
+sys.path.append('../analysis/')
+from utilities import *
 from sense_checking import *
+from config import dbconn, dataset, columns_to_describe, duplicates
 
 pd.set_option('display.max_colwidth', 250)
 
@@ -33,27 +38,13 @@ dbconn = os.environ.get('FULL_DATABASE_URL', None).strip('"')
 
 """
 
-header = """
-display(
-md(f"# Data Plausibility Check for {dataset}"),
-md(f"Note: all row/patient counts are rounded to the nearest 10 and counts <=5 removed"),
-)
-"""
 
-methods = """
+notebook_run_date = """
 display(
-md("### Methods"),
-md(f"The {dataset} dataset has been linked to patients in OpenSAFELY-TPP, covering 40% of England's population."),
-md(f"All analytical code and output is available for inspection at the [OpenSAFELY GitHub repository](https://github.com/opensafely)")
-)
-"""
-
-notebook_run_date = """\
-display(
-md(f"This notebook was run on {date.today().strftime('%Y-%m-%d')}"\
-    "and reflects the dataset at this date, "\
-    "but has been filtered to reflect the original data submission (`'Received' <= 2022-01-24`)."
-    )
+md(f'''This notebook was run on {date.today().strftime('%Y-%m-%d')}
+    and reflects the dataset at this date, 
+    but has been filtered to `{schema_filter}`.
+    ''')
 )"""
 
 get_data = """
@@ -78,16 +69,26 @@ counts_of_distinct_values(dbconn, table=dataset,
 """
 
 nb['cells'] = [
+    nbf.v4.new_markdown_cell(header),
     nbf.v4.new_code_cell(imports),
-    nbf.v4.new_code_cell(header),
-    nbf.v4.new_code_cell(methods),
-    nbf.v4.new_code_cell(get_data),
+    #nbf.v4.new_code_cell(get_data),
     nbf.v4.new_code_cell(notebook_run_date),
     nbf.v4.new_code_cell(schema),
     nbf.v4.new_code_cell(column_descriptions),
     ]
 
-counter = """\
+if duplicates:
+    duplicate_check = """display(md("### Duplicates"))
+
+    counts_of_distinct_values(dbconn, table=dataset, 
+        columns=duplicates["columns"], 
+        threshold=duplicates["threshold"], 
+        where=duplicates["where"])  
+    """
+
+    nb['cells'].append(nbf.v4.new_code_cell(duplicate_check))
+
+counter = """
 i=0
 """
 
@@ -109,4 +110,4 @@ i=0
 #     nb['cells'].append(nbf.v4.new_code_cell(cell_plot))
 
 
-nbf.write(nb, 'analysis/Test_Notebook.ipynb')
+nbf.write(nb, 'notebooks/Test_Notebook.ipynb')
