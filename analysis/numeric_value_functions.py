@@ -1,3 +1,7 @@
+from utilities import closing_connection
+import pandas as pd
+import os
+from IPython.display import display
 
 def numeric_values_query(dbconn, codelist, lower, upper, year):
     ''' extract code counts from sql, split by Numeric value within/outside specified range or missing'''
@@ -31,6 +35,7 @@ def numeric_values_query(dbconn, codelist, lower, upper, year):
     with closing_connection(dbconn) as cnxn:
         out = pd.read_sql(sql, cnxn)
     
+    print("Data imported")
     return out
 
 
@@ -50,6 +55,6 @@ def summarise_numeric_values(df, codelist_name, codelist, code_column, term_colu
     df1 = df1.sort_values(by="Total test count (thousands)", ascending=False)
 
     #export to csv
-    df1.to_csv(os.path.join('..','data', f'value_counts_{codelist_name}.csv'))
+    df1.to_csv(os.path.join('..','output', f'value_counts_{codelist_name}.csv'))
 
     display (df1)

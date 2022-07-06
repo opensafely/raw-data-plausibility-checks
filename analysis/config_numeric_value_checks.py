@@ -1,6 +1,8 @@
 
-# enter codelist name as a string
-codelist_name = 'creatinine'
+# enter codelist name as a string (include the full name of the csv, excluding the file extension)
+# e.g. 'opensafely-creatinine'
+codelist_name = 'opensafely-ast'
+
 
 # specify headers for code column and term (description) column in dataset
 # These should be strings
