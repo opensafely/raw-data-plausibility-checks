@@ -12,7 +12,8 @@ from config import start_date, end_date, codelist_path
 codelist_df = pd.read_csv(codelist_path)
 codelist_expectation_codes = codelist_df["code"].unique()
 
-# Specifiy study defeinition
+
+# Specify study definition
 study = StudyDefinition(
     index_date=start_date,
     # Configure the expectations framework
@@ -116,6 +117,22 @@ study = StudyDefinition(
             },
         },
     ),
+    
+    learning_disability=patients.with_these_clinical_events(
+        ld_codes,
+        on_or_before="index_date",
+        returning="binary_flag",
+        return_expectations={
+            "incidence": 0.01,
+        },
+    ),
+    care_home_status=patients.with_these_clinical_events(
+        nhse_care_homes_codes,
+        returning="binary_flag",
+        on_or_before="index_date",
+        return_expectations={"incidence": 0.2},
+    ),
+
     event=patients.with_these_clinical_events(
         codelist=codelist,
         between=["index_date", "last_day_of_month(index_date)"],
