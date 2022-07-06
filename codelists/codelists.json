@@ -29,6 +29,12 @@
       "url": "https://codelists.opensafely.org/codelist/opensafely/nhs-england-care-homes-residential-status/3712ef13/",
       "downloaded_at": "2021-05-10 16:07:53.643159Z",
       "sha": "357b2af4841e574f7d43bfeff143b39cdfed6997"
+    },
+    "user-bangzheng-creatinine.csv": {
+      "id": "user/bangzheng/creatinine/7a202b3a",
+      "url": "https://codelists.opensafely.org/codelist/user/bangzheng/creatinine/7a202b3a/",
+      "downloaded_at": "2022-04-27 10:19:46.628236Z",
+      "sha": "eb6442307e5f366e50b8b08bc9e6b4cf2339096a"
     }
   }
 }
