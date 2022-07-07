@@ -1,16 +1,43 @@
-#study start date.  should match date in project.yaml
-start_date = "2021-06-01"
+# enter table name
+table = "CodedEvent"
 
-#study end date.  should match date in project.yaml
-end_date = "2021-12-01"
+start_date = "2019-01-01"
+end_date = "2022-03-01"
 
-#demographic variables by which code use is broken down
-#select from ["sex", "age_band", "region", "imd", "ethnicity", "learning_disability"]
-demographics = ["sex", "age_band", "region", "imd", "ethnicity", "learning_disability", "care_home_status"]
+codelist_path = "codelists/nhsd-primary-care-domain-refsets-bp_cod.csv"
+#codelist_path = "codelists/user-bangzheng-creatinine.csv"
 
-#name of measure
-marker="Systolic blood pressure"
 
-#codelist path
-codelist_path = "codelists/opensafely-systolic-blood-pressure-qof.csv"
+# enter filters for schema
+# these are useful to (a) make the data size manageable (e.g. one month or year of data)
+# and (b) look at a subset of interest e.g. patients with COVID
+schema_filter = {
+    "": "where CAST(ConsultationDate AS DATE) <= '2022-03-01'",
+}
+
+# columns to describe
+# this produces a simple summary of the columns supplied
+columns_to_describe = {
+    "columns": [
+        "Diagnosis",
+        "FormName",
+        "Region",
+        "Der_LoadDate",
+        "AgeAtReceivedDate",
+        "Count",
+    ],
+    "threshold": 50,
+
+    "where":"CAST(Received AS DATE) <= '2022-01-24'", 
+    "include_counts":False,
+    }
+    
+# check for duplicates -  IF NOT REQUIRED use empty dict
+# columns here normally patient_id only;
+# each column supplied will be checked for duplicates in isolation, not in combination
+duplicates = {
+#     "columns": ["patient_id"], 
+#     "threshold": 50, 
+#     "where": "CAST(Received AS DATE) <= '2022-01-24'"
+     }
 
