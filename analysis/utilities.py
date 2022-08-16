@@ -29,14 +29,15 @@ def suppress_and_round(df, field="row_count", keep=False):
     df[field] = (10*((df[field]/10).round(0))).astype(int)
     return df, suppressed
 
+
 def simple_sql(dbconn, table, col, where):
     ''' extract data from sql'''
-    where_clause = ""
-    if where:
+    where = where or ""
+    if where and not where.lower().startswith("where"):
         where_clause = f"where {where}"
     
     with closing_connection(dbconn) as cnxn:
-        out = pd.read_sql(f"select {col}, count(*) as row_count from {table} {where_clause} group by {col}", cnxn)
+        out = pd.read_sql(f"select {col}, count(*) as row_count from {table} {where} group by {col}", cnxn)
     return out
 
 

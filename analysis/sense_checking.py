@@ -1,58 +1,69 @@
-import pandas as pd
-import numpy as np
 import os
 from datetime import date, datetime
-from IPython.display import display, Markdown
-
 import sys
+
+from IPython.display import display, Markdown
+import numpy as np
+import pandas as pd
+import pyodbc
+from tqdm import tqdm
+
 sys.path.append('../lib/')
 from utilities import *
 
 
-def get_schema(dbconn, table, where):
-    '''Import schema (filtered on 'where') and calculate counts of distinct values and nulls for each column
-    
+def get_schema(dbconn, table, where, columns=None, debug=False):
     '''
-    
-    # extract schema for specified table from schema table
-    with closing_connection(dbconn) as cnxn:
-        table_schema = pd.read_sql("""select * from OpenSAFELYSchemaInformation""", cnxn)
-        schema = pd.read_sql(f"select ColumnName, ColumnType, MaxLength, IsNullable from OpenSAFELYSchemaInformation where TableName = '{table}'", cnxn)
+    Import schema (filtered on 'where') and calculate counts of distinct values and nulls for each column
+    '''
+    display(Markdown(f"### Summary of table {table}"))
+    if where:
+        display(Markdown(f" **filtered on {where}**"))
+    with pyodbc.connect(dbconn) as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"select ColumnName, ColumnType, MaxLength, IsNullable from OpenSAFELYSchemaInformation where TableName = '{table}'")
+            results = cur.fetchall()
+            keys = ["ColumnName", "ColumnType", "MaxLength", "IsNullable"]
+            results_dicts = [
+                {keys[i]: v for i, v in enumerate(result)} for result in results 
+            ]
+            results_plus_counts = []
 
-    # set up a dict of dataframes to hold results for each 'where' clause
-    value_counts = {}
-    for w in where:
-        value_counts[w] = pd.DataFrame(columns=[f"Distinct_Values{w}", f"Missing_Values{w}"]) 
-
-    # extract counts of distinct values and nulls for each column and for each 'where' clause
-    with closing_connection(dbconn) as cnxn:
-        for c in schema["ColumnName"]:
-            for w in where:
-                counts = pd.read_sql(f"""select count(distinct {c}) as Distinct_Values{w},
-                                    sum(case when {c} is NULL THEN 1 ELSE 0 END) AS Missing_Values{w}
-                                    from {table}
-                                    {where[w]}
-                                    """, 
-                                 cnxn)
-
-                counts = counts.rename(index={0:c})
-                
-                value_counts[w] = value_counts[w].append(counts)
-
-    
-    
-    # compile into one output table containing schema + counts
-    out = schema.set_index("ColumnName").copy() 
-    for w in where:
-        out = out.join(value_counts[w])
+            for i, res_dict in enumerate(results_dicts, start=1):
+                col_name = res_dict["ColumnName"]
+                if columns is None or col_name in columns:
+                    if debug:
+                        print(f"Processing col {i} of {len(results_dicts)} ({col_name})")
+                    sql = f"SELECT COUNT(distinct {col_name}) FROM {table} {where}"
+                    cur.execute(sql)
+                    distinct=cur.fetchone()
+                    col_values = {"DistinctValues": distinct[0]}
+                    col_where = f"{col_name} IS NULL"
+                    col_where = f"{where} AND {col_where}" if where else f"WHERE {col_where}"
+                    sql = f"SELECT COUNT(*) FROM {table} {col_where}"
+                    cur.execute(sql)
+                    missing=cur.fetchone()
+                    col_values["MissingValues"] = missing[0]
+                    results_plus_counts.append({**res_dict, **col_values})
+                else:
+                    if debug:
+                        print(f"Skipping col {i} of {len(results_dicts)} ({col_name})")
+                    results_plus_counts.append({**res_dict, "DistinctValues": -1, "MissingValues": -1})
 
     # replace missing value counts with "1-5" for low values
-    for col in out.columns:
-        if ("Missing_Values" in col):
-            out[col] = out[col].replace([1,2,3,4,5], "1-5")
+    def replace_missing(val):
+        if val == -1:
+            return "-"
+        elif 0 < val <=5:
+            return "1-5"
+        else:
+            return val
 
+    out = pd.DataFrame.from_records(results_plus_counts)
+    out.MissingValues = out.MissingValues.apply(replace_missing)
+    out.DistinctValues = out.DistinctValues.apply(lambda x: "-" if x == -1 else x)
     display(out)
-    
+
 
     
 def counts_of_distinct_values(dbconn, table, columns, threshold=1, where=None, include_counts=True, sort_values=False):
@@ -93,8 +104,6 @@ def counts_of_distinct_values(dbconn, table, columns, threshold=1, where=None, i
             
         # suppress and round
         no_nulls, suppressed = suppress_and_round(no_nulls) 
-        
-           
         
         # For fields with a small range of possible values, list all possible values, with optional counts    
         if len(no_nulls[col]) <= threshold:
